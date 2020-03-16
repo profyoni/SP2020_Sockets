@@ -60,11 +60,11 @@ public class Server extends JFrame
       {
          server = new ServerSocket( 12345, 100 ); // create ServerSocket
 
-         while ( true ) 
-         {
-            try 
+         while ( true )  // infinite loop
             {
-               waitForConnection(); // wait for a connection
+               try
+               {
+               waitForConnection(); // wait for a connection from Client
                getStreams(); // get input & output streams
                processConnection(); // process connection
             } // end try
@@ -89,7 +89,8 @@ public class Server extends JFrame
    private void waitForConnection() throws IOException
    {
       displayMessage( "Waiting for connection\n" );
-      connection = server.accept(); // allow server to accept connection            
+      // blocking call (synchronous call.... not asynchronous (= on demand...where your code hets called back like an event handler)
+      connection = server.accept(); // allow server to accept connection
       displayMessage( "Connection " + counter + " received from: " +
          connection.getInetAddress().getHostName() );
    } // end method waitForConnection
@@ -98,7 +99,7 @@ public class Server extends JFrame
    private void getStreams() throws IOException
    {
       // set up output stream for objects
-      output = new ObjectOutputStream( connection.getOutputStream() );
+      output = new ObjectOutputStream( connection.getOutputStream() ); // Decorator DP
       output.flush(); // flush output buffer to send header information
 
       // set up input stream for objects
@@ -167,8 +168,8 @@ public class Server extends JFrame
    // manipulates displayArea in the event-dispatch thread
    private void displayMessage( final String messageToDisplay )
    {
-      SwingUtilities.invokeLater(
-         new Runnable() 
+      SwingUtilities.invokeLater( // call on the EDT - Event Dispatch Thread -- only thread safe to update GUI because Swing is not thread safe
+         new Runnable()
          {
             public void run() // updates displayArea
             {
